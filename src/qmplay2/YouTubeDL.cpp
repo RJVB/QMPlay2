@@ -36,22 +36,6 @@ constexpr const char *g_name = "YouTubeDL";
 
 static QReadWriteLock g_lock;
 
-/**/
-
-#ifndef Q_OS_ANDROID
-static void exportCookiesFromJSON(const QString &jsonData, const QString &url)
-{
-	const QJsonDocument json = QJsonDocument::fromJson(jsonData.toUtf8());
-	for (const QJsonValue &formats : json.object()["formats"].toArray())
-	{
-		if (url == formats.toObject()["url"].toString())
-			QMPlay2Core.addCookies(url, formats.toObject()["http_headers"].toObject()["Cookie"].toString().toUtf8());
-	}
-}
-#endif
-
-/**/
-
 QString YouTubeDL::getFilePath()
 {
 	return QMPlay2Core.getSettingsDir() + "youtube-dl"
@@ -205,10 +189,11 @@ QStringList YouTubeDL::exec(const QString &url, const QStringList &args, QString
 		"--no-check-certificate", //Ignore SSL errors
 	};
 
-	const bool useQMPlay2UserAgent = url.contains("vidfile.net/");
+	const bool isVIDFile = url.contains("vidfile.net/");
+	constexpr const char *mozillaUserAgent = "Mozilla";
 
-	if (useQMPlay2UserAgent)
-		commonArgs += {"--user-agent", Version::userAgent()};
+	if (isVIDFile)
+		commonArgs += {"--user-agent", mozillaUserAgent};
 
 	const char *httpProxy = getenv("http_proxy");
 	if (httpProxy && *httpProxy)
@@ -333,7 +318,18 @@ QStringList YouTubeDL::exec(const QString &url, const QStringList &args, QString
 		{
 			if (i > 0 && result.at(i).startsWith('{'))
 			{
-				exportCookiesFromJSON(result.at(i), result.at(i - 1));
+				const QString url = result.at(i - 1);
+
+				if (isVIDFile)
+					QMPlay2Core.addRawHeaders(url, QString("User-Agent: %1\r\nReferer: https://vidfile.net/v/\r\n").arg(mozillaUserAgent).toUtf8());
+
+				const QJsonDocument json = QJsonDocument::fromJson(result.at(i).toUtf8());
+				for (const QJsonValue &formats : json.object()["formats"].toArray())
+				{
+					if (url == formats.toObject()["url"].toString())
+						QMPlay2Core.addCookies(url, formats.toObject()["http_headers"].toObject()["Cookie"].toString().toUtf8());
+				}
+
 				result.removeAt(i);
 			}
 		}
