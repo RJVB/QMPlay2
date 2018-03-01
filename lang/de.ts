@@ -632,6 +632,22 @@
         <source>Play</source>
         <translation>Wiedergabe</translation>
     </message>
+    <message>
+        <source>Conversion aborted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conversion error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Converting...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop conversion</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Downloader</name>
@@ -666,6 +682,57 @@
     <message>
         <source>Enter address</source>
         <translation>Adresse eingeben</translation>
+    </message>
+    <message>
+        <source>&amp;Add</source>
+        <translation type="unfinished">&amp;Hinzufügen</translation>
+    </message>
+    <message>
+        <source>Add, modify, or remove conversion presets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download and convert to &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Converter preset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command line to execute after download.
+
+&lt;input/&gt; - specifies downloaded file.
+&lt;output&gt;%f.mp3&lt;/output&gt; - converted file will be input file with &quot;mp3&quot; extension.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished">Entfernen</translation>
+    </message>
+    <message>
+        <source>Preset name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command line</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incorrect/empty name or command line!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command must contain &lt;input/&gt; tag!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command must contain correct &lt;output&gt;file&lt;/output/&gt; tag!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preset name already exists!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -834,10 +901,6 @@
         <translation>Blättern</translation>
     </message>
     <message>
-        <source>...</source>
-        <translation>...</translation>
-    </message>
-    <message>
         <source>Use system icon set</source>
         <translation>Verwende System Icons</translation>
     </message>
@@ -964,6 +1027,10 @@
     <message>
         <source>Hide artist metadata</source>
         <translation>Künstler-Metadaten ausblenden</translation>
+    </message>
+    <message>
+        <source>Automatically restore main window when new video file is loaded</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1764,6 +1831,14 @@ Die OpenGL Video-Ausgabe wird im RTT-Modus empfohlen.</translation>
         <source>This sets the selected output device to the sample rate of the content being played</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>High quality video scaling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trilinear filtering for minification and bicubic filtering for magnification.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ModulesList</name>
@@ -2234,6 +2309,10 @@ Die OpenGL Video-Ausgabe wird im RTT-Modus empfohlen.</translation>
     </message>
     <message>
         <source>Store aspect ratio and zoom in config file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unpause when seeking</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3146,30 +3225,30 @@ Teilweise geprüft wirkt sich nicht auf den Schieberegler aus.</translation>
     </message>
 </context>
 <context>
-    <name>VideoAdjustment</name>
+    <name>VideoAdjustmentW</name>
+    <message>
+        <source>Reset</source>
+        <translation type="unfinished">Zurücksetzen</translation>
+    </message>
     <message>
         <source>Brightness</source>
-        <translation>Helligkeit</translation>
+        <translation type="unfinished">Helligkeit</translation>
     </message>
     <message>
         <source>Contrast</source>
-        <translation>Kontrast</translation>
+        <translation type="unfinished">Kontrast</translation>
     </message>
     <message>
         <source>Saturation</source>
-        <translation>Sättigung</translation>
+        <translation type="unfinished">Sättigung</translation>
     </message>
     <message>
         <source>Hue</source>
-        <translation>Farbton</translation>
+        <translation type="unfinished">Farbton</translation>
     </message>
     <message>
         <source>Sharpness</source>
-        <translation>Schärfe</translation>
-    </message>
-    <message>
-        <source>Reset</source>
-        <translation>Zurücksetzen</translation>
+        <translation type="unfinished">Schärfe</translation>
     </message>
 </context>
 <context>

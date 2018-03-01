@@ -143,6 +143,7 @@ void SettingsWidget::InitSettings()
 	QMPSettings.init("BlurCovers", true);
 	QMPSettings.init("ShowDirCovers", true);
 	QMPSettings.init("AutoOpenVideoWindow", true);
+	QMPSettings.init("AutoRestoreMainWindowOnVideo", true);
 	if (!QMPSettings.contains("AutoUpdates"))
 		QMPSettings.init("AutoUpdates", !QFile::exists(QMPlay2Core.getShareDir() + "noautoupdates"));
 	QMPSettings.init("MainWidget/TabPositionNorth", false);
@@ -183,6 +184,7 @@ void SettingsWidget::InitSettings()
 	QMPSettings.init("WheelSeek", true);
 	QMPSettings.init("LeftMouseTogglePlay", false);
 	QMPSettings.init("AccurateSeek", Qt::PartiallyChecked);
+	QMPSettings.init("UnpauseWhenSeeking", false);
 	QMPSettings.init("StoreARatioAndZoom", false);
 	QMPSettings.init("SavePos", false);
 	QMPSettings.init("KeepZoom", false);
@@ -348,6 +350,7 @@ SettingsWidget::SettingsWidget(int page, const QString &moduleName, QWidget *vid
 		page1->showDirCoversB->setChecked(QMPSettings.getBool("ShowDirCovers"));
 
 		page1->autoOpenVideoWindowB->setChecked(QMPSettings.getBool("AutoOpenVideoWindow"));
+		page1->autoRestoreMainWindowOnVideoB->setChecked(QMPSettings.getBool("AutoRestoreMainWindowOnVideo"));
 
 		page1->autoUpdatesB->setChecked(QMPSettings.getBool("AutoUpdates"));
 #ifndef UPDATER
@@ -483,6 +486,8 @@ SettingsWidget::SettingsWidget(int page, const QString &moduleName, QWidget *vid
 
 		page2->accurateSeekB->setCheckState((Qt::CheckState)QMPSettings.getInt("AccurateSeek"));
 		page2->accurateSeekB->setToolTip(tr("Slower, but more accurate seeking.\nPartially checked doesn't affect seeking on slider."));
+
+		page2->unpauseWhenSeekingB->setChecked(QMPSettings.getBool("UnpauseWhenSeeking"));
 
 		const QString modulesListTitle[3] = {
 			tr("Video output priority"),
@@ -786,6 +791,7 @@ void SettingsWidget::apply()
 			QMPSettings.set("BlurCovers", page1->blurCoversB->isChecked());
 			QMPSettings.set("ShowDirCovers", page1->showDirCoversB->isChecked());
 			QMPSettings.set("AutoOpenVideoWindow", page1->autoOpenVideoWindowB->isChecked());
+			QMPSettings.set("AutoRestoreMainWindowOnVideo", page1->autoRestoreMainWindowOnVideoB->isChecked());
 			QMPSettings.set("AutoUpdates", page1->autoUpdatesB->isChecked());
 			QMPSettings.set("MainWidget/TabPositionNorth", page1->tabsNorths->isChecked());
 #ifdef QMPLAY2_ALLOW_ONLY_ONE_INSTANCE
@@ -854,6 +860,7 @@ void SettingsWidget::apply()
 			QMPSettings.set("IgnorePlaybackError", page2->ignorePlaybackError->isChecked());
 			QMPSettings.set("LeftMouseTogglePlay", page2->leftMouseTogglePlay->isChecked());
 			QMPSettings.set("AccurateSeek", page2->accurateSeekB->checkState());
+			QMPSettings.set("UnpauseWhenSeeking", page2->unpauseWhenSeekingB->isChecked());
 			QMPSettings.set("StoreARatioAndZoom", page2->storeARatioAndZoomB->isChecked());
 
 			QStringList videoWriters, audioWriters, decoders;

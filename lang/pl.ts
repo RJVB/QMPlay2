@@ -613,6 +613,22 @@
         <translation>Rozmiar</translation>
     </message>
     <message>
+        <source>Download again</source>
+        <translation>Pobierz ponownie</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation>Odtwarzaj</translation>
+    </message>
+    <message>
+        <source>Converting...</source>
+        <translation>Konwertowanie...</translation>
+    </message>
+    <message>
+        <source>Stop conversion</source>
+        <translation>Zatrzymaj konwersję</translation>
+    </message>
+    <message>
         <source>Download complete</source>
         <translation>Pobieranie ukończone</translation>
     </message>
@@ -625,12 +641,12 @@
         <translation>Błąd pobierania</translation>
     </message>
     <message>
-        <source>Download again</source>
-        <translation>Pobierz ponownie</translation>
+        <source>Conversion aborted</source>
+        <translation>Konwersja przerwana</translation>
     </message>
     <message>
-        <source>Play</source>
-        <translation>Odtwarzaj</translation>
+        <source>Conversion error</source>
+        <translation>Błąd konwersji</translation>
     </message>
 </context>
 <context>
@@ -666,6 +682,60 @@
     <message>
         <source>Enter address</source>
         <translation>Wprowadź adres</translation>
+    </message>
+    <message>
+        <source>&amp;Add</source>
+        <translation>&amp;Dodaj</translation>
+    </message>
+    <message>
+        <source>Add, modify, or remove conversion presets</source>
+        <translation>Dodaj, zmodyfikuj lub usuń ustawienia konwersji</translation>
+    </message>
+    <message>
+        <source>Download and convert to &quot;%1&quot;</source>
+        <translation>Pobierz i skonwertuj do &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <source>Converter preset</source>
+        <translation>Ustawienie konwertera</translation>
+    </message>
+    <message>
+        <source>Command line to execute after download.
+
+&lt;input/&gt; - specifies downloaded file.
+&lt;output&gt;%f.mp3&lt;/output&gt; - converted file will be input file with &quot;mp3&quot; extension.</source>
+        <translation>Linia poleceń do wykonania po ukończeniu pobierania.
+
+&lt;input/&gt; - określa pobrany plik.
+&lt;output&gt;%f.mp3&lt;/output&gt; - skonwertowany plik będzie plikiem wejściowym z rozszerzeniem &quot;mp3&quot;.</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Usuń</translation>
+    </message>
+    <message>
+        <source>Preset name</source>
+        <translation>Nazwa ustawienia</translation>
+    </message>
+    <message>
+        <source>Command line</source>
+        <translation>Linia poleceń</translation>
+    </message>
+    <message>
+        <source>Incorrect/empty name or command line!</source>
+        <translation>Nieprawidłowa/pusta nazwa lub linia poleceń!</translation>
+    </message>
+    <message>
+        <source>Command must contain &lt;input/&gt; tag!</source>
+        <translation>Polecenie musi zawierać znacznik &lt;input/&gt;!</translation>
+    </message>
+    <message>
+        <source>Command must contain correct &lt;output&gt;file&lt;/output/&gt; tag!</source>
+        <translation>Polecenie musi zawierać poprawny znacznik &lt;output&gt;file&lt;/output/&gt;!</translation>
+    </message>
+    <message>
+        <source>Preset name already exists!</source>
+        <translation>Nazwa ustawienia już istnieje!</translation>
     </message>
 </context>
 <context>
@@ -834,10 +904,6 @@
         <translation>Przeglądaj</translation>
     </message>
     <message>
-        <source>...</source>
-        <translation>...</translation>
-    </message>
-    <message>
         <source>Use system icon set</source>
         <translation>Użyj systemowego zestawu ikon</translation>
     </message>
@@ -964,6 +1030,10 @@
     <message>
         <source>Hide artist metadata</source>
         <translation>Ukryj metadane artysty</translation>
+    </message>
+    <message>
+        <source>Automatically restore main window when new video file is loaded</source>
+        <translation>Automatycznie przywróć główne okno po załadowaniu nowego pliku wideo</translation>
     </message>
 </context>
 <context>
@@ -1764,6 +1834,14 @@ Zalecane użycie jeżeli wyjście wideo OpenGL jest w trybie RTT.</translation>
         <source>This sets the selected output device to the sample rate of the content being played</source>
         <translation>Ustawia wybrane urządzenie wyjściowe na częstotliwość próbkowania odtwarzanej zawartości</translation>
     </message>
+    <message>
+        <source>High quality video scaling</source>
+        <translation>Skalowanie wideo wysokiej jakości</translation>
+    </message>
+    <message>
+        <source>Trilinear filtering for minification and bicubic filtering for magnification.</source>
+        <translation>Filtrowanie trójliniowe dla pomniejszania i filtrowanie dwusześcienne dla powiększenia.</translation>
+    </message>
 </context>
 <context>
     <name>ModulesList</name>
@@ -2235,6 +2313,10 @@ Zalecane użycie jeżeli wyjście wideo OpenGL jest w trybie RTT.</translation>
     <message>
         <source>Store aspect ratio and zoom in config file</source>
         <translation>Zapisz współczynnik proporcji i zoom w pliku konfiguracyjnym</translation>
+    </message>
+    <message>
+        <source>Unpause when seeking</source>
+        <translation>Wznów odtwarzanie podczas przewijania</translation>
     </message>
 </context>
 <context>
@@ -3146,7 +3228,11 @@ Częściowo zaznaczone nie wpływa na przeijanie na suwaku.</translation>
     </message>
 </context>
 <context>
-    <name>VideoAdjustment</name>
+    <name>VideoAdjustmentW</name>
+    <message>
+        <source>Reset</source>
+        <translation>Resetuj</translation>
+    </message>
     <message>
         <source>Brightness</source>
         <translation>Jasność</translation>
@@ -3166,10 +3252,6 @@ Częściowo zaznaczone nie wpływa na przeijanie na suwaku.</translation>
     <message>
         <source>Sharpness</source>
         <translation>Ostrość</translation>
-    </message>
-    <message>
-        <source>Reset</source>
-        <translation>Resetuj</translation>
     </message>
 </context>
 <context>

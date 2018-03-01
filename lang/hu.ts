@@ -632,6 +632,22 @@
         <source>Size</source>
         <translation>Méret</translation>
     </message>
+    <message>
+        <source>Conversion aborted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conversion error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Converting...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop conversion</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Downloader</name>
@@ -666,6 +682,57 @@
     <message>
         <source>Enter address</source>
         <translation>Add met a címet</translation>
+    </message>
+    <message>
+        <source>&amp;Add</source>
+        <translation type="unfinished">&amp;Hozzáadás</translation>
+    </message>
+    <message>
+        <source>Add, modify, or remove conversion presets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download and convert to &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Converter preset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command line to execute after download.
+
+&lt;input/&gt; - specifies downloaded file.
+&lt;output&gt;%f.mp3&lt;/output&gt; - converted file will be input file with &quot;mp3&quot; extension.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preset name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command line</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incorrect/empty name or command line!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command must contain &lt;input/&gt; tag!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command must contain correct &lt;output&gt;file&lt;/output/&gt; tag!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preset name already exists!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -886,10 +953,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>...</source>
-        <translation>...</translation>
-    </message>
-    <message>
         <source>Use system icon set</source>
         <translation>Rendszer ikonkészletének használata</translation>
     </message>
@@ -964,6 +1027,10 @@
     <message>
         <source>Hide artist metadata</source>
         <translation>Előadó metaadat elrejtése</translation>
+    </message>
+    <message>
+        <source>Automatically restore main window when new video file is loaded</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1761,6 +1828,14 @@ Recommended to use when OpenGL video output is in RTT mode.</source>
         <source>This sets the selected output device to the sample rate of the content being played</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>High quality video scaling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trilinear filtering for minification and bicubic filtering for magnification.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ModulesList</name>
@@ -2231,6 +2306,10 @@ Recommended to use when OpenGL video output is in RTT mode.</source>
     </message>
     <message>
         <source>Store aspect ratio and zoom in config file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unpause when seeking</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3142,30 +3221,30 @@ Partially checked doesn&apos;t affect seeking on slider.</source>
     </message>
 </context>
 <context>
-    <name>VideoAdjustment</name>
+    <name>VideoAdjustmentW</name>
+    <message>
+        <source>Reset</source>
+        <translation type="unfinished">Visszaállítás</translation>
+    </message>
     <message>
         <source>Brightness</source>
-        <translation>Fényerő</translation>
+        <translation type="unfinished">Fényerő</translation>
     </message>
     <message>
         <source>Contrast</source>
-        <translation>Kontraszt</translation>
+        <translation type="unfinished">Kontraszt</translation>
     </message>
     <message>
         <source>Saturation</source>
-        <translation>Telítettség</translation>
+        <translation type="unfinished">Telítettség</translation>
     </message>
     <message>
         <source>Hue</source>
-        <translation>Árnyalat</translation>
+        <translation type="unfinished">Árnyalat</translation>
     </message>
     <message>
         <source>Sharpness</source>
-        <translation>Élesség</translation>
-    </message>
-    <message>
-        <source>Reset</source>
-        <translation>Visszaállítás</translation>
+        <translation type="unfinished">Élesség</translation>
     </message>
 </context>
 <context>
