@@ -1,4 +1,4 @@
-Changes in QMPlay2 build 18.02.24:
+Changes in QMPlay2 build 18.03.02:
 	- allow to move video and subtitles in OpenGL2 video output (Ctrl and Shift key modifiers),
 	- add option to automatically perform non-recursive quick sync on playlist group,
 	- add high quality video scaling in OpenGL2 video output (disabled by default),
@@ -7,6 +7,7 @@ Changes in QMPlay2 build 18.02.24:
 	- move "My radio stations" into "Radio Browser" tab and add Drag and drop,
 	- properly open YouTube M3U8 live streams (through youtube-dl),
 	- option to convert media file after download (e.g. to MP3),
+	- audio fade in/out is now disabled for video contents,
 	- don't unpause when seeking (default option),
 	- QPainter video output optimizations,
 	- add sorting YouTube search results,

@@ -32,7 +32,7 @@
 Q_LOGGING_CATEGORY(animeodcinki, "AnimeOdcinki")
 
 constexpr const char *g_url = "https://a-o.ninja/anime/";
-constexpr const char *g_linkexpander = "http://www.linkexpander.com/get_url.php";
+constexpr const char *g_linkexpander = "https://linkexpander.com/get_url.php";
 constexpr const char *g_serverPrioritiesUrl = "https://raw.githubusercontent.com/zaps166/QMPlay2OnlineContents/master/AnimeOdcinki.json";
 
 static AnimeOdcinki::AnimePairList parseAnimeList(const QByteArray &data, AnimeOdcinki::AnimePair *episodeImgDescr)
@@ -241,7 +241,7 @@ void AnimeOdcinki::setCompleterListCallback(const CompleterReadyCallback &callba
 		if (m_animePairList.isEmpty() && !m_animeListReply)
 		{
 			m_animeListReply = start(g_url);
-			connect(m_animeListReply.data(), &NetworkReply::finished, this, &AnimeOdcinki::gotAnimeList);
+			connect(m_animeListReply, SIGNAL(finished()), this, SLOT(gotAnimeList()));
 		}
 		else if (!m_animePairList.isEmpty())
 		{
