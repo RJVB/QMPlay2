@@ -34,6 +34,8 @@
 
 // FIXME: Why Haiku can't use upstream yt-dlp?
 
+#include <QtLegacySupport.hpp>
+
 constexpr const char *g_name = "YouTubeDL";
 static bool g_mustUpdate = true;
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
@@ -54,6 +56,16 @@ QString YouTubeDL::getFilePath()
 #endif
     ;
 }
+
+QString YouTubeDL::getUnpackedFilePath()
+{
+    return QMPlay2Core.getSettingsDir() + "__main__.py"
+#ifdef Q_OS_WIN
+    "_x86.exe"
+#endif
+    ;
+}
+
 QStringList YouTubeDL::getCommonArgs()
 {
     QStringList commonArgs {
@@ -93,9 +105,14 @@ bool YouTubeDL::fixUrl(const QString &url, QString &outUrl, IOController<> *ioCt
 
 YouTubeDL::YouTubeDL()
     : m_ytDlPath(getFilePath())
+    , m_ytDLUnpackedPath(getUnpackedFilePath())
     , m_commonArgs(getCommonArgs())
     , m_aborted(false)
-{}
+{
+    if (!QFileInfo::exists(m_ytDLUnpackedPath)) {
+        m_ytDLUnpackedPath.clear();
+    }
+}
 YouTubeDL::~YouTubeDL()
 {}
 
@@ -245,8 +262,8 @@ QStringList YouTubeDL::exec(const QString &url, const QStringList &args, QString
             {
                 const QString url = result.at(i - 1);
 
-                const QJsonDocument json = QJsonDocument::fromJson(result.at(i).toUtf8());
-                for (const QJsonValue &formats : json["formats"].toArray())
+                const QJD json = QJsonDocument::fromJson(result.at(i).toUtf8());
+                for (const QJV &formats : json["formats"].toQJsonArray())
                 {
                     if (url == formats["url"].toString())
                         QMPlay2Core.addCookies(url, formats["http_headers"]["Cookie"].toString().toUtf8());
@@ -360,6 +377,7 @@ bool YouTubeDL::download()
                 {
                     emit QMPlay2Core.sendMessage(tr("\"youtube-dl\" has been successfully downloaded!"), g_name);
                     QMPlay2Core.setWorking(false);
+                    unpack();
                     return true;
                 }
             }
@@ -387,7 +405,7 @@ bool YouTubeDL::update()
     QMPlay2Core.setWorking(true);
 
     ensureExecutable();
-    startProcess(QStringList() << "-U" << m_commonArgs);
+    startProcess(QStringList() << "-U" << m_commonArgs, false);
     if (!m_process.waitForStarted())
     {
         QMPlay2Core.setWorking(false);
@@ -418,6 +436,7 @@ bool YouTubeDL::update()
         {
             QMPlay2Core.setWorking(false);
             emit QMPlay2Core.sendMessage(tr("\"youtube-dl\" has been successfully updated!"), g_name);
+            unpack();
             return true;
         }
     }
@@ -430,6 +449,34 @@ bool YouTubeDL::update()
     return true;
 }
 
+bool YouTubeDL::unpack()
+{
+    bool ret = false;
+#ifdef Q_OS_UNIX
+    const auto unzip = QStandardPaths::findExecutable("unzip");
+    if (!unzip.isNull() && !unzip.isEmpty() && !m_aborted) {
+        QProcess unzipIt;
+        unzipIt.setWorkingDirectory(QMPlay2Core.getSettingsDir());
+        unzipIt.setProgram(unzip);
+        unzipIt.setArguments(QStringList() << "-o" << "-q" << m_ytDlPath);
+        unzipIt.start();
+        unzipIt.waitForFinished(-1);
+        if (unzipIt.exitStatus() == QProcess::NormalExit && unzipIt.exitCode() <= 1) {
+            qDebug() << m_ytDlPath << "unpacked";
+            const QString unpacked = getUnpackedFilePath();
+            if (QFileInfo::exists(unpacked)) {
+                m_ytDLUnpackedPath = unpacked;
+                ret = true;
+            } else {
+                qWarning() << "unpacking did not give a __main__.py file!";
+                m_ytDLUnpackedPath.clear();
+            }
+        }
+    }
+#endif
+    return ret;
+}
+
 void YouTubeDL::ensureExecutable()
 {
 #if !defined(Q_OS_WIN) && !defined(Q_OS_HAIKU)
@@ -437,6 +484,15 @@ void YouTubeDL::ensureExecutable()
     {
         QFile file(m_ytDlPath);
         file.setPermissions(file.permissions() | QFile::ExeOwner | QFile::ExeUser | QFile::ExeGroup | QFile::ExeOther);
+    }
+    if (m_ytDLUnpackedPath.isEmpty()) {
+        unpack();
+    }
+    if (!m_ytDLUnpackedPath.isEmpty()) {
+        if (!QFileInfo(m_ytDLUnpackedPath).isExecutable()) {
+            QFile file(m_ytDLUnpackedPath);
+            file.setPermissions(file.permissions() | QFile::ExeOwner | QFile::ExeUser | QFile::ExeGroup | QFile::ExeOther);
+        }
     }
 #endif
 }
@@ -453,9 +509,9 @@ bool YouTubeDL::onProcessCantStart()
     return prepare();
 }
 
-void YouTubeDL::startProcess(QStringList args)
+void YouTubeDL::startProcess(QStringList args, bool allowUnpacked)
 {
-    QString program = m_ytDlPath;
+    QString program = (allowUnpacked && !m_ytDLUnpackedPath.isEmpty())? m_ytDLUnpackedPath : m_ytDlPath;
 
 #ifndef Q_OS_WIN
     QFile ytDlFile(program);
@@ -469,6 +525,7 @@ void YouTubeDL::startProcess(QStringList args)
             if (QStandardPaths::findExecutable(pythonCmd).endsWith(pythonCmd))
             {
                 args.prepend(program);
+                args.prepend("-OO");
                 program = pythonCmd;
             }
 #ifdef Q_OS_MACOS

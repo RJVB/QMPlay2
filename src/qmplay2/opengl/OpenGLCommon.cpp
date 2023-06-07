@@ -34,6 +34,8 @@
 #include <QPainter>
 #include <QLibrary>
 #include <QWidget>
+#include <QLoggingCategory>
+#include <QOpenGLFunctions>
 
 /* OpenGL|ES 2.0 doesn't have those definitions */
 #ifndef GL_MAP_WRITE_BIT
@@ -52,6 +54,11 @@
     #define GL_TEXTURE_RECTANGLE_ARB 0x84F5
 #endif
 
+Q_LOGGING_CATEGORY(gllog, "OpenGLLog")
+
+OpenGLInstance::GLBindTexture OpenGLCommon::glBindTexture = nullptr;
+OpenGLInstance::GLTexParameteri OpenGLCommon::glTexParameteri = nullptr;
+
 OpenGLCommon::OpenGLCommon() :
     VideoOutputCommon(false),
     vSync(true),
@@ -66,16 +73,27 @@ OpenGLCommon::OpenGLCommon() :
     hasVbo(true),
     nIndices(0)
 {
-#ifndef OPENGL_ES2
+// #ifndef OPENGL_ES2
     glActiveTexture = m_glInstance->glActiveTexture;
     glGenBuffers = m_glInstance->glGenBuffers;
     glBindBuffer = m_glInstance->glBindBuffer;
     glBufferData = m_glInstance->glBufferData;
     glDeleteBuffers = m_glInstance->glDeleteBuffers;
-#endif
+// #endif
     glMapBufferRange = m_glInstance->glMapBufferRange;
     glMapBuffer = m_glInstance->glMapBuffer;
     glUnmapBuffer = m_glInstance->glUnmapBuffer;
+
+    glBindTexture = m_glInstance->glBindTexture;
+    glTexParameteri = m_glInstance->glTexParameteri;
+    glClear = m_glInstance->glClear;
+    glDisable = m_glInstance->glDisable;
+    glEnable = m_glInstance->glEnable;
+    glTexImage2D = m_glInstance->glTexImage2D;
+    glTexSubImage2D = m_glInstance->glTexSubImage2D;
+    glDrawArrays = m_glInstance->glDrawArrays;
+    glDrawElements = m_glInstance->glDrawElements;
+    glDeleteTextures = m_glInstance->glDeleteTextures;
 
     videoAdjustment.unset();
 
@@ -83,9 +101,9 @@ OpenGLCommon::OpenGLCommon() :
     texCoordYCbCr[0] = texCoordYCbCr[4] = texCoordYCbCr[5] = texCoordYCbCr[7] = 0.0f;
     texCoordYCbCr[1] = texCoordYCbCr[3] = 1.0f;
 
-#ifndef Q_OS_MACOS
+// #ifndef Q_OS_MACOS
     canUseHueSharpness = (m_glInstance->glVer >= 30);
-#endif
+// #endif
 
     m_matrixChangeFn = [this] {
         setMatrix = true;
@@ -133,8 +151,10 @@ void OpenGLCommon::initialize(const std::shared_ptr<OpenGLHWInterop> &hwInterop)
             if (!context.create() || !context.makeCurrent(&surface))
             {
                 isOK = false;
+                qCCritical(gllog) << Q_FUNC_INFO << "Failed to create a QOpenGLContext, or to make it current for" << surface.format();
                 return;
             }
+            qCWarning(gllog) << Q_FUNC_INFO << "Got OpenGL context format:" << context.format();
         }
 
         switch (hwInterop->getFormat())
@@ -310,9 +330,15 @@ void OpenGLCommon::initializeGL()
         return;
     }
 
+    if (!QOpenGLContext::currentContext() || !QOpenGLContext::currentContext()->isValid()) {
+        qCCritical(gllog) << Q_FUNC_INFO << "No current or invalid OpenGL context";
+    } else {
+        qCWarning(gllog) << Q_FUNC_INFO << "Current OpenGL context:" << QOpenGLContext::currentContext()->format();
+    }
     /* Set OpenGL parameters */
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glClearColor(0.0, 0.0, 0.0, 1.0);
+    auto qgl = QOpenGLFunctions(QOpenGLContext::currentContext());
+    qgl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    qgl.glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
     glDisable(GL_STENCIL_TEST);
     glDisable(GL_DEPTH_TEST);
@@ -320,7 +346,7 @@ void OpenGLCommon::initializeGL()
 
     /* Prepare textures */
     const int texturesToGen = m_hwInterop ? 0 : numPlanes;
-    glGenTextures(texturesToGen + 1, textures);
+    qgl.glGenTextures(texturesToGen + 1, textures);
     for (int i = 0; i < texturesToGen + 1; ++i)
     {
         const quint32 tmpTarget = (i == 0) ? GL_TEXTURE_2D : target;
@@ -330,7 +356,7 @@ void OpenGLCommon::initializeGL()
     if (hasPbo)
     {
         glGenBuffers(1 + texturesToGen, pbo);
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        qgl.glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     }
 
     setVSync(vSync);

@@ -75,12 +75,24 @@ bool FFDecVTB::open(StreamInfo &streamInfo)
 {
     if (streamInfo.params->codec_type != AVMEDIA_TYPE_VIDEO)
         return false;
-
+    if (streamInfo.params->codec_id == AV_CODEC_ID_VP9)
+    {
+#if __has_builtin(__builtin_available)
+        if (! __builtin_available(macOS 10.15, *))
+#endif
+        {
+            qWarning() << "VP9 not supported by VTB";
+            return false;
+        }
+    }
     const AVPixelFormat pix_fmt = streamInfo.pixelFormat();
     if (pix_fmt == AV_PIX_FMT_YUV420P10)
     {
         if (streamInfo.params->codec_id == AV_CODEC_ID_H264)
+        {
+            qWarning() << "H264/yuv420p10 not supported by VTB";
             return false;
+        }
     }
     else if (pix_fmt != AV_PIX_FMT_YUV420P && pix_fmt != AV_PIX_FMT_YUVJ420P)
     {
@@ -89,7 +101,10 @@ bool FFDecVTB::open(StreamInfo &streamInfo)
 
     AVCodec *codec = init(streamInfo);
     if (!codec || !hasHWAccel("videotoolbox"))
+    {
+        qWarning() << "VTB: no or unsupported codec";
         return false;
+    }
 
 #ifdef USE_OPENGL
     shared_ptr<VTBOpenGL> vtbOpenGL;
@@ -103,14 +118,20 @@ bool FFDecVTB::open(StreamInfo &streamInfo)
 #endif
 
     if (!m_hwDeviceBufferRef && av_hwdevice_ctx_create(&m_hwDeviceBufferRef, AV_HWDEVICE_TYPE_VIDEOTOOLBOX, nullptr, nullptr, 0) != 0)
+    {
+        qWarning() << "VTB: failed to create hwdevice_ctx";
         return false;
+    }
 
 #ifdef USE_OPENGL
     if (QMPlay2Core.renderer() == QMPlay2CoreClass::Renderer::OpenGL && !vtbOpenGL)
     {
         vtbOpenGL = make_shared<VTBOpenGL>(m_hwDeviceBufferRef);
         if (!QMPlay2Core.gpuInstance()->setHWDecContextForVideoOutput(vtbOpenGL))
+        {
+            qWarning() << "VTB: failed to set VTB GPU context";
             return false;
+        }
     }
 
     if (vtbOpenGL)
@@ -121,7 +142,10 @@ bool FFDecVTB::open(StreamInfo &streamInfo)
     codec_ctx->get_format = vtbGetFormat;
     codec_ctx->thread_count = 1;
     if (!openCodec(codec))
+    {
+        qWarning() << "VTB: failed to open codec";
         return false;
+    }
 
     m_timeBase = streamInfo.time_base;
     return true;

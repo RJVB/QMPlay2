@@ -30,6 +30,8 @@
 
 #include <algorithm>
 
+#include <QtLegacySupport.hpp>
+
 struct Column
 {
     QString url, homePageUrl, id;
@@ -312,7 +314,7 @@ void RadioBrowserModel::replyFinished(NetworkReply *reply)
 
                 const QPixmap radioIcon = QIcon(":/radio.svgz").pixmap(elementHeight(), elementHeight());
 
-                for (const QJsonValue item : arrayItems)
+                for (const QJV item : arrayItems)
                 {
                     if (!item.isObject())
                         continue;

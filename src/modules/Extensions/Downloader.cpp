@@ -65,7 +65,7 @@ constexpr const char *g_conversionError = QT_TRANSLATE_NOOP("DownloadItemW", "Co
 
 /**/
 
-static QStringView getCommandOutput(const QString &command)
+static QStringRef getCommandOutput(const QString &command)
 {
     const int idx1 = command.indexOf("<output>");
     if (idx1 < 0)
@@ -75,7 +75,7 @@ static QStringView getCommandOutput(const QString &command)
     if (idx2 < 0)
         return {};
 
-    return QStringView(command).mid(idx1 + 8, idx2 - idx1 - 8);
+    return command.midRef(idx1 + 8, idx2 - idx1 - 8);
 }
 
 static void maybeAddAbsolutePath(QString &convertCommand)

@@ -95,7 +95,7 @@ public:
     }
 };
 
-#ifndef Q_OS_MACOS
+// #ifndef Q_OS_MACOS
 static void copyMenu(QMenu *dest, QMenu *src, QMenu *dontCopy = nullptr)
 {
     QMenu *newMenu = new QMenu(src->title(), dest);
@@ -111,7 +111,7 @@ static void copyMenu(QMenu *dest, QMenu *src, QMenu *dontCopy = nullptr)
     }
     dest->addMenu(newMenu);
 }
-#endif
+// #endif
 
 /* MainWidget */
 MainWidget::MainWidget(QList<QPair<QString, QString>> &arguments)
@@ -154,7 +154,7 @@ MainWidget::MainWidget(QList<QPair<QString, QString>> &arguments)
 
     QMPlay2GUI.menuBar = new MenuBar;
 
-#if !defined Q_OS_MACOS && !defined Q_OS_ANDROID
+#if /*!defined Q_OS_MACOS &&*/ !defined Q_OS_ANDROID
     tray = new QSystemTrayIcon(this);
     tray->setIcon(QMPlay2Core.getIconFromTheme("QMPlay2-panel", QMPlay2Core.getQMPlay2Icon()));
     tray->setVisible(settings.getBool("TrayVisible", true));
@@ -341,7 +341,7 @@ MainWidget::MainWidget(QList<QPair<QString, QString>> &arguments)
     if (settings.getBool("MainWidget/TabPositionNorth"))
         setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
-#if !defined Q_OS_MACOS && !defined Q_OS_ANDROID
+#if /*!defined Q_OS_MACOS &&*/ !defined Q_OS_ANDROID
     const bool menuHidden = settings.getBool("MainWidget/MenuHidden", false);
     menuBar->setVisible(!menuHidden);
     hideMenuAct = new QAction(tr("&Hide menu bar"), menuBar);
@@ -406,7 +406,7 @@ MainWidget::MainWidget(QList<QPair<QString, QString>> &arguments)
         setAttribute(Qt::WA_NoSystemBackground, false);
     }
 
-#if defined Q_OS_MACOS || defined Q_OS_ANDROID
+#if /*defined Q_OS_MACOS ||*/ defined Q_OS_ANDROID
     show();
 #else
     setVisible(settings.getBool("MainWidget/isVisible", true) ? true : !isTrayVisible());
@@ -609,8 +609,10 @@ void MainWidget::videoStarted(bool noVideo)
     if (autoRestoreMainWindowOnVideo || (noVideo && autoOpenVideoWindow))
     {
         if (!videoDock->isVisible())
+        {
             videoDock->show();
-        videoDock->raise();
+            videoDock->raise();
+        }
     }
     if (autoRestoreMainWindowOnVideo)
     {
@@ -618,11 +620,11 @@ void MainWidget::videoStarted(bool noVideo)
         {
             toggleVisibility();
         }
-        else
-        {
-            activateWindow();
-            raise();
-        }
+//         else
+//         {
+//             activateWindow();
+//             raise();
+//         }
     }
     m_restoreWindowOnVideo = false;
 }
@@ -972,7 +974,7 @@ void MainWidget::createMenuBar()
 
     setMenuBar(menuBar);
 
-#ifndef Q_OS_MACOS
+#ifndef Q_OS_MACOS_FOR_REAL
     if (tray)
     {
         auto secondMenu = new QMenu(this);
@@ -1056,7 +1058,7 @@ void MainWidget::toggleCompactView()
 
         hideAllExtensions();
 
-#if !defined Q_OS_MACOS && !defined Q_OS_ANDROID
+#if /*!defined Q_OS_MACOS &&*/ !defined Q_OS_ANDROID
         menuBar->hide();
 #endif
         mainTB->hide();
@@ -1079,7 +1081,7 @@ void MainWidget::toggleCompactView()
         restoreState(dockWidgetState);
         dockWidgetState.clear();
 
-#if !defined Q_OS_MACOS && !defined Q_OS_ANDROID
+#if /*!defined Q_OS_MACOS &&*/ !defined Q_OS_ANDROID
         menuBar->setVisible(!hideMenuAct->isChecked());
 #endif
 
@@ -1105,7 +1107,7 @@ void MainWidget::toggleFullScreen()
 #ifndef Q_OS_ANDROID
     static bool maximized;
 #endif
-#ifdef Q_OS_MACOS
+#if defined(Q_OS_MACOS) && !defined(HAVE_X11)
     if (isFullScreen())
     {
         showNormal();
@@ -1122,7 +1124,7 @@ void MainWidget::toggleFullScreen()
 #ifndef Q_OS_ANDROID
         maximized = isMaximized();
 
-#ifndef Q_OS_MACOS
+#if !defined(Q_OS_MACOS) || defined(HAVE_X11)
 #ifndef Q_OS_WIN
         if (isFullScreen())
 #endif
@@ -1136,7 +1138,7 @@ void MainWidget::toggleFullScreen()
         dockWidgetState = saveState();
 #endif // Q_OS_ANDROID
 
-#if !defined Q_OS_MACOS && !defined Q_OS_ANDROID
+#if /*!defined Q_OS_MACOS &&*/ !defined Q_OS_ANDROID
         menuBar->hide();
 #endif
         statusBar->hide();
@@ -1165,14 +1167,14 @@ void MainWidget::toggleFullScreen()
         videoDock->fullScreen(true);
         videoDock->show();
 
-#ifdef Q_OS_MACOS
+// #if defined(Q_OS_MACOS)
         menuBar->window->toggleVisibility->setEnabled(false);
-#endif
+// #endif
         menuBar->window->toggleCompactView->setEnabled(false);
         menuBar->window->toggleFullScreen->setShortcuts(QList<QKeySequence>() << menuBar->window->toggleFullScreen->shortcut() << QKeySequence("ESC"));
         fullScreen = true;
 
-#ifndef Q_OS_MACOS
+#if !defined(Q_OS_MACOS) || defined(HAVE_X11)
         showFullScreen();
 #else
         setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
@@ -1186,9 +1188,9 @@ void MainWidget::toggleFullScreen()
     }
     else
     {
-#ifdef Q_OS_MACOS
+// #if defined(Q_OS_MACOS)
         menuBar->window->toggleVisibility->setEnabled(true);
-#endif
+// #endif
         menuBar->window->toggleCompactView->setEnabled(true);
         menuBar->window->toggleFullScreen->setShortcuts(QList<QKeySequence>() << menuBar->window->toggleFullScreen->shortcut());
 
@@ -1196,7 +1198,7 @@ void MainWidget::toggleFullScreen()
         fullScreen = false;
 
 #ifndef Q_OS_ANDROID
-#ifdef Q_OS_MACOS
+#if defined(Q_OS_MACOS) && !defined(HAVE_X11)
         QMPlay2MacExtensions::showSystemUi(windowHandle(), true);
         setWindowFlags(Qt::Window);
 #else
@@ -1206,7 +1208,7 @@ void MainWidget::toggleFullScreen()
             showMaximized();
         else
         {
-#ifdef Q_OS_MACOS
+#if defined(Q_OS_MACOS) && !defined(HAVE_X11)
             showNormal();
 #endif
             setGeometry(savedGeo);
@@ -1232,7 +1234,7 @@ void MainWidget::toggleFullScreen()
             if (QDockWidget *dw = QMPlay2Ext->getDockWidget())
                 dw->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
 
-#if !defined Q_OS_MACOS && !defined Q_OS_ANDROID
+#if /*!defined Q_OS_MACOS &&*/ !defined Q_OS_ANDROID
         menuBar->setVisible(!hideMenuAct->isChecked());
 #endif
         statusBar->show();
@@ -1465,7 +1467,7 @@ void MainWidget::about()
     }
 }
 
-#if !defined Q_OS_MACOS && !defined Q_OS_ANDROID
+// #if !defined Q_OS_MACOS && !defined Q_OS_ANDROID
 void MainWidget::hideMenu(bool h)
 {
     if (fullScreen || isCompactView)
@@ -1476,7 +1478,7 @@ void MainWidget::hideMenu(bool h)
         QMPlay2Core.getSettings().set("MainWidget/MenuHidden", h);
     }
 }
-#endif
+// #endif
 void MainWidget::lockWidgets(bool l)
 {
     if (fullScreen || isCompactView)
@@ -1558,7 +1560,7 @@ void MainWidget::setStreamsMenu(const QStringList &videoStreams, const QStringLi
                 connect(action, &QAction::triggered,
                         this, [this, data = std::move(lines[1])] {
                     if (data.startsWith("seek"))
-                        seek(QStringView(data).mid(4)MAYBE_TO_STRING.toDouble());
+                        seek(data.midRef(4).toDouble());
                     else
                         playC.chStream(data);
                 });
@@ -1605,7 +1607,7 @@ QMenu *MainWidget::createPopupMenu()
     QMenu *popupMenu = QMainWindow::createPopupMenu();
     if (!fullScreen && !isCompactView)
     {
-#if !defined Q_OS_MACOS && !defined Q_OS_ANDROID
+#if /*!defined Q_OS_MACOS &&*/ !defined Q_OS_ANDROID
         popupMenu->insertAction(popupMenu->actions().value(0), hideMenuAct);
         popupMenu->insertSeparator(popupMenu->actions().value(1));
         popupMenu->addSeparator();
@@ -1838,6 +1840,16 @@ void MainWidget::mouseMoveEvent(QMouseEvent *e)
         {
             showToolBar(true); //Before restoring dock widgets - show toolbar and status bar
 
+            // FullScreenDockWidgetState has been known to become corrupted, which can cause
+            // Qt to get stuck in an infinite loop trying to restore layout of the videoDock. 
+            // This can lead to a crash or abort. Prevent this in 2 ways:
+            // 1) don't do our mouseMove event processing during the call to restoreState()
+            //    There's only ever a single MainWidget instance so we just use a local static.
+            // 2) by clearing the setting here. If all goes well, the value we will be using
+            //    now will be saved again. If not, we'll have gotten rid of the corrupt value.
+            auto &settings = QMPlay2Core.getSettings();
+            settings.remove("MainWidget/FullScreenDockWidgetState");
+            settings.flush();
             inRestoreState = true;
             restoreState(fullScreenDockWidgetState);
             inRestoreState = false;
@@ -1934,9 +1946,9 @@ void MainWidget::closeEvent(QCloseEvent *e)
     }
     settings.set("MainWidget/FullScreenDockWidgetState", fullScreenDockWidgetState);
     settings.set("MainWidget/AlwaysOnTop", !!(windowFlags() & Qt::WindowStaysOnTopHint));
-#ifndef Q_OS_MACOS
+// #ifndef Q_OS_MACOS
     settings.set("MainWidget/isVisible", isVisible());
-#endif
+// #endif
     if (tray)
         settings.set("TrayVisible", tray->isVisible());
     settings.set("VolumeL", volW->volumeL());
@@ -2035,7 +2047,9 @@ bool MainWidget::eventFilter(QObject *obj, QEvent *event)
 #ifdef Q_OS_MACOS
     else if (event->type() == QEvent::FileOpen)
     {
-        filesToAdd.append(((QFileOpenEvent *)event)->file());
+        auto url = ((QFileOpenEvent *)event)->url();
+        filesToAdd.append(url.scheme() == "file" ? ((QFileOpenEvent *)event)->file()
+            : Functions::maybeExtensionAddress(url.url()));
         fileOpenTimer.start(10);
     }
 #endif

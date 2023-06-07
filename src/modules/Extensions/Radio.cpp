@@ -38,6 +38,8 @@
 #include <QMenu>
 #include <QUrl>
 
+#include <QtLegacySupport.hpp>
+
 Radio::Radio(Module &module) :
     m_newStationTxt(tr("Adding a new radio station")),
     m_radioIcon(":/radio.svgz"),
@@ -229,7 +231,7 @@ void Radio::replyFinished(NetworkReply *reply)
             if (json.isArray())
             {
                 QStringList list;
-                for (const QJsonValue &data : json.array())
+                for (const QJV &data : json.array())
                 {
                     if (!data.isObject())
                         continue;
@@ -324,7 +326,12 @@ void Radio::on_saveMyRadioStationButton_clicked()
     if (idx < 0)
         return;
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
     const auto suffix = QStringView(filter).mid(idx + 2).chopped(1)MAYBE_TO_STRING;
+#else
+    const auto mid = filter.midRef(idx + 2);
+    const auto suffix = mid.left(mid.size() - 1).toString();
+#endif
     if (!filePath.endsWith(suffix, Qt::CaseInsensitive))
         filePath += suffix;
 

@@ -65,7 +65,7 @@ public:
         m_networkReply(networkReply),
         m_url(url),
         m_postData(postData),
-        m_rawHeaders(rawHeaders),
+        m_rawHeaders(rawHeaders + "Accept-Language: " + QMPlay2Core.getLanguage().toLatin1() + "\r\n" ),
         m_customUserAgent(params.customUserAgent),
         m_maxSize(params.maxSize),
         m_retries(params.retries),

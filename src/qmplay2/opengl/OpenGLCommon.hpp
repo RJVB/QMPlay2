@@ -85,16 +85,27 @@ protected:
 
     void contextAboutToBeDestroyed();
 
-#ifndef OPENGL_ES2
+// #ifndef OPENGL_ES2
     OpenGLInstance::GLActiveTexture glActiveTexture = nullptr;
     OpenGLInstance::GLGenBuffers glGenBuffers = nullptr;
     OpenGLInstance::GLBindBuffer glBindBuffer = nullptr;
     OpenGLInstance::GLBufferData glBufferData = nullptr;
     OpenGLInstance::GLDeleteBuffers glDeleteBuffers = nullptr;
-#endif
+// #endif
     OpenGLInstance::GLMapBufferRange glMapBufferRange = nullptr;
     OpenGLInstance::GLMapBuffer glMapBuffer = nullptr;
     OpenGLInstance::GLUnmapBuffer glUnmapBuffer = nullptr;
+
+    static OpenGLInstance::GLBindTexture glBindTexture;
+    static OpenGLInstance::GLTexParameteri glTexParameteri;
+    OpenGLInstance::GLClear glClear = nullptr;
+    OpenGLInstance::GLVoidFunGLenum glDisable = nullptr;
+    OpenGLInstance::GLVoidFunGLenum glEnable = nullptr;
+    OpenGLInstance::GLTexImage2D glTexImage2D = nullptr;
+    OpenGLInstance::GLTexSubImage2D glTexSubImage2D = nullptr;
+    OpenGLInstance::GLDrawArrays glDrawArrays = nullptr;
+    OpenGLInstance::GLDrawElements glDrawElements = nullptr;
+    OpenGLInstance::GLDeleteTextures glDeleteTextures = nullptr;
 
     bool vSync;
 

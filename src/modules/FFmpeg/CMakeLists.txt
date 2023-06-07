@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.12)
 project(FFmpeg)
 
+# string(REPLACE "-fvisibility=hidden" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+# string(REPLACE "-fvisibility-inlines-hidden" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+
 set(FFmpeg_HDR
     FFmpeg.hpp
     FFDemux.hpp

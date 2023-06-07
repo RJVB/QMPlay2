@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.12)
 project(libqmplay2)
 
+# string(REPLACE "-fvisibility=hidden" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+# string(REPLACE "-fvisibility-inlines-hidden" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+
 set(QMPLAY2_HDR
     QMPlay2Lib.hpp
     QMPlay2Core.hpp
@@ -128,7 +131,7 @@ if(USE_OPENGL)
         list(APPEND OPENGL_LIBS Qt6::OpenGL Qt6::OpenGLWidgets)
     endif()
 
-    if(APPLE)
+    if(APPLE AND NOT USE_XVIDEO)
         find_package(OpenGL REQUIRED)
         list(APPEND OPENGL_LIBS ${OPENGL_LIBRARIES})
     elseif(WIN32)
@@ -275,6 +278,12 @@ if(USE_YOUTUBEDL)
         YouTubeDL.cpp
     )
 endif()
+list(APPEND QMPLAY2_HDR
+    QtLegacySupport.hpp
+)
+list(APPEND QMPLAY2_SRC
+    QtLegacySupport.cpp
+)
 
 set(QMPLAY2_RESOURCES
     languages.qrc
@@ -352,7 +361,7 @@ if(WIN32)
     install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX})
 else()
     install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-    if(NOT APPLE)
+    if(NOT APPLE_STANDALONE_BUNDLE)
         install(FILES ${QMPLAY2_HDR} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/QMPlay2")
     endif()
 endif()

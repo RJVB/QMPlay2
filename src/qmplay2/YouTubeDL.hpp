@@ -48,19 +48,22 @@ private:
     void abort() override;
 
 private:
+    static QString getUnpackedFilePath();
     bool prepare();
 
     bool download();
     bool update();
+    bool unpack();
 
     void ensureExecutable();
 
     bool onProcessCantStart();
 
-    void startProcess(QStringList args);
+    void startProcess(QStringList args, bool allowUnpacked = true);
 
 private:
     const QString m_ytDlPath;
+    QString m_ytDLUnpackedPath;
     const QStringList m_commonArgs;
     IOController<NetworkReply> m_reply;
     QProcess m_process;

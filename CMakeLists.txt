@@ -47,7 +47,7 @@ else()
     set(QT_PREFIX Qt5)
 endif()
 
-find_package(${QT_PREFIX}Widgets 5.10 REQUIRED)
+find_package(${QT_PREFIX}Widgets 5.9.8 REQUIRED)
 if(BUILD_WITH_QT6)
     find_package(Qt6Core5Compat REQUIRED)
 endif()
@@ -299,7 +299,7 @@ option(USE_PIPEWIRE "Build with PipeWire module" ${LIBPIPEWIRE_FOUND})
 add_feature_info(PipeWire USE_PIPEWIRE "Build with PipeWire module")
 
 if(NOT DEFINED USE_XVIDEO)
-    pkg_check_modules(LIB_X11_XV x11 xv)
+    pkg_check_modules(LIB_X11_XV x11 xv xext)
 endif()
 option(USE_XVIDEO "Build with XVideo module" ${LIB_X11_XV_FOUND})
 add_feature_info(XVideo USE_XVIDEO "Build with XVideo module")
@@ -336,6 +336,9 @@ if(USE_GIT_VERSION)
 endif()
 add_feature_info("Git version" QMPLAY2_GIT_HEAD "Append Git HEAD to QMPlay2 version")
 
+option(USE_HIDDEN_VISIBILITY "Use selective export control in shared libraries" ON)
+add_feature_info(VISIBILITY USE_HIDDEN_VISIBILITY "Use selective export control in shared libraries")
+
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang") # GCC or Clang
     option(USE_LINK_TIME_OPTIMIZATION "Enable link time optimization for release builds" OFF)
     add_feature_info("Link Time Optimization" USE_LINK_TIME_OPTIMIZATION "Enable link time optimization for release builds")
@@ -358,9 +361,19 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang"
     endif()
 
     # Hide symbols, and also make sure that debugging symbols are disabled
-    set(CMAKE_CXX_FLAGS_RELEASE    "${RELEASE_DEBUG_FLAG} -fvisibility=hidden -fvisibility-inlines-hidden ${CMAKE_CXX_FLAGS_RELEASE}")
-    set(CMAKE_CXX_FLAGS_MINSIZEREL "${RELEASE_DEBUG_FLAG} -fvisibility=hidden -fvisibility-inlines-hidden ${CMAKE_CXX_FLAGS_MINSIZEREL}")
+    if(USE_HIDDEN_VISIBILITY)
+        set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+    else()
+        # be sure to reset these so code can be rebuilt without the option
+        set(CMAKE_CXX_VISIBILITY_PRESET default)
+    endif()
+    # this one can always be enabled:
+    set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+    set(CMAKE_CXX_FLAGS            "${CMAKE_CXX_FLAGS}")
+    set(CMAKE_CXX_FLAGS_RELEASE    "${RELEASE_DEBUG_FLAG} ${CMAKE_CXX_FLAGS_RELEASE}")
+    set(CMAKE_CXX_FLAGS_MINSIZEREL "${RELEASE_DEBUG_FLAG} ${CMAKE_CXX_FLAGS_MINSIZEREL}")
     if(NOT USE_VULKAN)
+        set(CMAKE_CXX_FLAGS            "-fno-exceptions ${CMAKE_CXX_FLAGS}")
         set(CMAKE_CXX_FLAGS_RELEASE    "-fno-exceptions ${CMAKE_CXX_FLAGS_RELEASE}")
         set(CMAKE_CXX_FLAGS_MINSIZEREL "-fno-exceptions ${CMAKE_CXX_FLAGS_MINSIZEREL}")
     endif()
@@ -380,8 +393,9 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang"
     endif()
 
     if(USE_LINK_TIME_OPTIMIZATION)
+        set(CMAKE_CXX_FLAGS            "-flto ${CMAKE_CXX_FLAGS}")
         set(CMAKE_CXX_FLAGS_RELEASE    "-flto ${CMAKE_CXX_FLAGS_RELEASE}")
-        set(CMAKE_CXX_FLAGS_MINSIZEREL "-flto ${CMAKE_CXX_FLAGS_RELEASE}")
+        set(CMAKE_CXX_FLAGS_MINSIZEREL "-flto ${CMAKE_CXX_FLAGS_MINSIZEREL}")
     endif()
 
     if(CMAKE_MODULE_LINKER_FLAGS)
@@ -395,19 +409,22 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang"
 endif()
 
 if(APPLE)
-    set(MAC_BUNDLE_PATH "${CMAKE_INSTALL_PREFIX}/QMPlay2.app")
+    set(MAC_BUNDLE_PATH "${BUNDLE_INSTALL_DIR}/QMPlay2.app")
 
     # set paths to Bundle
     set(CMAKE_INSTALL_DATAROOTDIR "${MAC_BUNDLE_PATH}/Contents/share")
     set(CMAKE_INSTALL_LIBDIR      "${MAC_BUNDLE_PATH}/Contents/MacOS")
+    if(NOT APPLE_STANDALONE_BUNDLE)
+        include(GNUInstallDirs)
+    endif()
 elseif(NOT WIN32)
     include(GNUInstallDirs)
 endif()
 
-if(NOT APPLE)
+# if(NOT APPLE)
     set(INSTALL_PATH_ICONS "${CMAKE_INSTALL_DATAROOTDIR}/icons")
     set(INSTALL_PATH_MIME "${CMAKE_INSTALL_DATAROOTDIR}/mime")
-endif()
+# endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD" AND CMAKE_INSTALL_PREFIX STREQUAL "/usr/local")
     set(INSTALL_PATH_MAN "man") # exception for FreeBSD
@@ -463,7 +480,7 @@ else()
     install(FILES AUTHORS ChangeLog LICENSE README.md DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/qmplay2")
 endif()
 
-if(NOT APPLE AND NOT WIN32)
+# if(NOT APPLE AND NOT WIN32)
     # uninstall target
     configure_file(
         "${CMAKE_CURRENT_SOURCE_DIR}/src/cmake/Uninstall.cmake.in"
@@ -472,7 +489,7 @@ if(NOT APPLE AND NOT WIN32)
 
     add_custom_target(uninstall
         COMMAND ${CMAKE_COMMAND} -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
-endif()
+# endif()
 
 feature_summary(WHAT ENABLED_FEATURES DESCRIPTION "Enabled features:")
 feature_summary(WHAT DISABLED_FEATURES DESCRIPTION "Disabled features:")

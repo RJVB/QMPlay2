@@ -44,6 +44,12 @@
 #include <QBuffer>
 #include <QFile>
 #include <QDir>
+#ifdef Q_OS_MACOS
+    #include <QMap>
+    #include <QProcess>
+    #include <syslog.h>
+    #include <stdarg.h>
+#endif
 #ifdef CHECK_FOR_EGL
     #include <QLibrary>
 #endif
@@ -57,6 +63,10 @@
 
 static ScreenSaver *g_screenSaver = nullptr;
 static bool g_useGui = true;
+#ifdef Q_OS_MACOS
+    static QByteArray g_rcdPath("/System/Library/LaunchAgents/com.apple.rcd.plist");
+    static bool g_rcdLoad;
+#endif
 
 /**/
 
@@ -287,7 +297,7 @@ static QCommandLineParser *createCmdParser(bool descriptions)
 }
 static QString fileArg(const QString &arg)
 {
-    if (!arg.contains("://"))
+    if (!arg.contains("://") && !arg.startsWith("youtube:"))
     {
         const QFileInfo argInfo(arg);
         if (!argInfo.isAbsolute())
@@ -356,6 +366,15 @@ static bool writeToSocket(IPCSocket &socket, QList<QPair<QString, QString>> &arg
 
 static inline void exitProcedure()
 {
+#ifdef Q_OS_MACOS
+    if (g_rcdLoad)
+    {
+        // Load RCD service again (allow to run iTunes on "Play" key)
+        QProcess::startDetached("launchctl load " + g_rcdPath);
+        g_rcdLoad = false;
+    }
+#endif
+
     delete g_screenSaver;
     g_screenSaver = nullptr;
 }
@@ -518,6 +537,23 @@ static void messageHandler(QtMsgType type, const QMessageLogContext &context, co
         g_messageHandlerMutex.unlock();
 #endif
     }
+#ifdef Q_OS_MACOS
+    else
+    {
+        // send a copy of terminal output to the syslog.
+        static const QMap<QtMsgType,int> type2Level = {
+            {QtDebugMsg, LOG_DEBUG},
+            {QtWarningMsg, LOG_WARNING},
+            {QtCriticalMsg, LOG_CRIT},
+            {QtFatalMsg, LOG_CRIT},
+            {QtInfoMsg, LOG_INFO}
+        };
+        g_messageHandlerMutex.lock();
+        syslog(LOG_NDELAY|LOG_PID|type2Level[type], "%s",
+               qFormatLogMessage(type, context, message).toLocal8Bit().constData());
+        g_messageHandlerMutex.unlock();
+    }
+#endif
 }
 
 #ifdef CHECK_FOR_EGL
@@ -636,9 +672,11 @@ int main(int argc, char *argv[])
 #endif
 
 #ifdef Q_OS_MACOS
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
     auto fmt = QSurfaceFormat::defaultFormat();
     fmt.setColorSpace(QSurfaceFormat::sRGBColorSpace);
     QSurfaceFormat::setDefaultFormat(fmt);
+#endif
 #endif
 
 #ifndef Q_OS_WIN
@@ -777,6 +815,16 @@ int main(int argc, char *argv[])
 
 #ifdef Q_OS_WIN
     HHOOK keyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, MMKeysHookProc, GetModuleHandle(nullptr), 0);
+#endif
+
+#ifdef Q_OS_MACOS
+    // Unload RCD service (prevent run iTunes on "Play" key)
+    {
+        QProcess launchctl;
+        launchctl.start("launchctl unload " + g_rcdPath);
+        if (launchctl.waitForFinished() && launchctl.exitStatus() == QProcess::NormalExit)
+            g_rcdLoad = !launchctl.readAllStandardError().startsWith(g_rcdPath);
+    }
 #endif
 
     srand(time(nullptr));

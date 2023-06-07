@@ -706,7 +706,7 @@ void DemuxerThr::updateCoverAndPlaying(bool doCompare)
     const QString prevTitle  = title;
     const QString prevArtist = artist;
     const QString prevAlbum  = album;
-    QString lyrics = QMPlay2Core.getDescriptionForUrl(url);
+    QString lyrics = description = QMPlay2Core.getDescriptionForUrl(url);
     title.clear();
     artist.clear();
     album.clear();
@@ -868,6 +868,19 @@ void DemuxerThr::emitInfo()
     if (demuxer->bitrate() > 0)
         info += "<b>" + tr("Bitrate") + ":</b> " + QString::number(demuxer->bitrate()) + "kbps<br/>";
     info += "<b>" + tr("Format") + ":</b> " + demuxer->name();
+    //description
+    auto desc = description.split("\n");
+    description.clear();
+    if (!desc.isEmpty()) {
+        if (!desc.isEmpty()) {
+            auto line = desc.takeFirst();
+            info += "<br><b>" + tr("Description") + ":</b> " + line;
+            while (!desc.isEmpty()) {
+                line = desc.takeFirst();
+                info += "<br>&nbsp;&nbsp;" + line;
+            }
+        }
+    }
 
     if (!demuxer->image().isNull())
         info += "<br/><br/><a href='save_cover'>" + tr("Save cover picture") + "</a>";

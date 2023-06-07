@@ -213,7 +213,7 @@ int QMPlay2CoreClass::getCPUMaxAlign()
 bool QMPlay2CoreClass::isGlOnWindowForced()
 {
     static bool forced = [] {
-#ifdef Q_OS_MACOS
+#if defined(Q_OS_MACOS) && QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
 #   if defined(MAC_OS_X_VERSION_10_14) && (MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_14)
         return (QOperatingSystemVersion::current() <= QOperatingSystemVersion::MacOSHighSierra);
 #   else

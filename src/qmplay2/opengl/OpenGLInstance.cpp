@@ -19,6 +19,7 @@ bool OpenGLInstance::init()
     const bool canCreateNonPowerOfTwoTextures = extenstions.contains("GL_ARB_texture_non_power_of_two");
     if (!supportsShaders || !canCreateNonPowerOfTwoTextures)
         return false;
+#endif
 
     glActiveTexture = (GLActiveTexture)context.getProcAddress("glActiveTexture");
     if (!glActiveTexture)
@@ -29,14 +30,26 @@ bool OpenGLInstance::init()
     glBufferData = (GLBufferData)context.getProcAddress("glBufferData");
     glDeleteBuffers = (GLDeleteBuffers)context.getProcAddress("glDeleteBuffers");
     hasVBO = glGenBuffers && glBindBuffer && glBufferData && glDeleteBuffers;
-#endif
     glMapBufferRange = (GLMapBufferRange)context.getProcAddress("glMapBufferRange");
     glMapBuffer = (GLMapBuffer)context.getProcAddress("glMapBuffer");
     glUnmapBuffer = (GLUnmapBuffer)context.getProcAddress("glUnmapBuffer");
     hasPBO = hasVBO && (glMapBufferRange || glMapBuffer) && glUnmapBuffer;
 
-#if !defined(OPENGL_ES2) && !defined(Q_OS_MACOS) // On macOS I have always OpenGL 2.1...
+    glBindTexture = (GLBindTexture)context.getProcAddress("glBindTexture");
+    glTexParameteri = (GLTexParameteri)context.getProcAddress("glTexParameteri");
+    glClear = (GLClear)context.getProcAddress("glClear");
+    glDisable = (GLVoidFunGLenum)context.getProcAddress("glDisable");
+    glEnable = (GLVoidFunGLenum)context.getProcAddress("glEnable");
+    glTexImage2D = (GLTexImage2D)context.getProcAddress("glTexImage2D");
+    glTexSubImage2D = (GLTexSubImage2D)context.getProcAddress("glTexSubImage2D");
+    glDrawArrays = (GLDrawArrays)context.getProcAddress("glDrawArrays");
+    glDrawElements = (GLDrawElements)context.getProcAddress("glDrawElements");
+    glDeleteTextures = (GLDeleteTextures)context.getProcAddress("glDeleteTextures");
+
+#if !defined(OPENGL_ES2) /*&& !defined(Q_OS_MACOS)*/ // On macOS I have always OpenGL 2.1...
     int glMajor = 0, glMinor = 0;
+    using GLGetIntegerv = void (APIENTRY *)(GLenum, GLint*);
+    GLGetIntegerv glGetIntegerv = (GLGetIntegerv) context.getProcAddress("glGetIntegerv");
     glGetIntegerv(GL_MAJOR_VERSION, &glMajor);
     glGetIntegerv(GL_MINOR_VERSION, &glMinor);
 

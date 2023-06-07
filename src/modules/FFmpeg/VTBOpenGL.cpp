@@ -22,6 +22,7 @@
 
 #include <QOpenGLContext>
 #include <QImage>
+#include <QLoggingCategory>
 
 extern "C"
 {
@@ -105,12 +106,17 @@ bool VTBOpenGL::mapFrame(Frame &videoFrame)
             internalFormat1 = GL_RG8;
             type = GL_UNSIGNED_BYTE;
             break;
+#if defined(__MAC_10_13) && defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_13
         case kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange:
+#else
+        case 'x420':
+#endif
             internalFormat0 = GL_R16;
             internalFormat1 = GL_RG16;
             type = GL_UNSIGNED_SHORT;
             break;
         default:
+            qWarning() << Q_FUNC_INFO << "Unsupported pixelFormat" << pixelFormat;
             m_error = true;
             return false;
     }

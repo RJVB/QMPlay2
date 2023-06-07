@@ -4,6 +4,9 @@ project(QMPlay2)
 if(WIN32)
     find_package(Qt5WinExtras 5.10 REQUIRED)
 endif()
+if(USE_XVIDEO)
+    add_definitions(-DHAVE_X11)
+endif()
 
 set(GUI_HDR
     Main.hpp
@@ -221,7 +224,8 @@ if(WIN32)
     target_link_libraries(${PROJECT_NAME} Qt5::WinExtras winmm)
 elseif(APPLE)
     set_target_properties(${PROJECT_NAME} PROPERTIES
-        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/macOS/BundleInfo.plist.in")
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/macOS/BundleInfo.plist.in"
+        MACOSX_BUNDLE_GUI_IDENTIFIER "org.zaps166.${PROJECT_NAME}")
     target_link_libraries(${PROJECT_NAME} ${APPKIT_LIBRARY} ${IOKIT_LIBRARY})
 endif()
 if(USE_TAGLIB AND (NOT WIN32 OR CMAKE_HOST_WIN32))
@@ -235,50 +239,54 @@ endif()
 if(WIN32)
     install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/)
 elseif(APPLE)
-    install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION ${CMAKE_INSTALL_PREFIX})
+    install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION ${BUNDLE_INSTALL_DIR})
 
     set(QT_LIBS_DIR "${${QT_PREFIX}Widgets_DIR}/../..")
     set(QT_PLUGINS_DIR "${QT_LIBS_DIR}/../plugins")
-    install(FILES
-        "${QT_PLUGINS_DIR}/platforms/libqcocoa.dylib"
-        DESTINATION "${MAC_BUNDLE_PATH}/Contents/plugins/platforms")
-    install(FILES
-        "${QT_PLUGINS_DIR}/iconengines/libqsvgicon.dylib"
-        DESTINATION "${MAC_BUNDLE_PATH}/Contents/plugins/iconengines")
-    install(FILES
-        "${QT_PLUGINS_DIR}/styles/libqmacstyle.dylib"
-        DESTINATION "${MAC_BUNDLE_PATH}/Contents/plugins/styles"
-        OPTIONAL)
-    install(DIRECTORY
-        "${QT_PLUGINS_DIR}/imageformats"
-        DESTINATION "${MAC_BUNDLE_PATH}/Contents/plugins"
-        PATTERN "*_debug.dylib" EXCLUDE
-        PATTERN "*.dSYM" EXCLUDE)
-    install(DIRECTORY
-        "${QT_LIBS_DIR}/../translations"
-        DESTINATION "${MAC_BUNDLE_PATH}/Contents"
-        FILES_MATCHING
-        PATTERN "qtbase_*.qm")
-    if(EXISTS "/usr/local/bin/ffmpeg")
-        install(PROGRAMS
-            "/usr/local/bin/ffmpeg"
-            DESTINATION "${MAC_BUNDLE_PATH}/Contents/MacOS")
-    else()
-        message(WARNING "FFmpeg executable not copied!")
+    if(APPLE_STANDALONE_BUNDLE)
+        install(FILES
+            "${QT_PLUGINS_DIR}/platforms/libqcocoa.dylib"
+            DESTINATION "${MAC_BUNDLE_PATH}/Contents/plugins/platforms")
+        install(FILES
+            "${QT_PLUGINS_DIR}/iconengines/libqsvgicon.dylib"
+            DESTINATION "${MAC_BUNDLE_PATH}/Contents/plugins/iconengines")
+        install(FILES
+            "${QT_PLUGINS_DIR}/styles/libqmacstyle.dylib"
+            DESTINATION "${MAC_BUNDLE_PATH}/Contents/plugins/styles"
+            OPTIONAL)
+        install(DIRECTORY
+            "${QT_PLUGINS_DIR}/imageformats"
+            DESTINATION "${MAC_BUNDLE_PATH}/Contents/plugins"
+            PATTERN "*_debug.dylib" EXCLUDE
+            PATTERN "*.dSYM" EXCLUDE)
+        install(DIRECTORY
+            "${QT_LIBS_DIR}/../translations"
+            DESTINATION "${MAC_BUNDLE_PATH}/Contents"
+            FILES_MATCHING
+            PATTERN "qtbase_*.qm")
+        if(EXISTS "/opt/local/bin/ffmpeg")
+            install(PROGRAMS
+                "/opt/local/bin/ffmpeg"
+                DESTINATION "${MAC_BUNDLE_PATH}/Contents/MacOS")
+        else()
+            message(WARNING "FFmpeg executable not copied!")
+        endif()
+        install(CODE "
+            include(BundleUtilities)
+            set(BU_CHMOD_BUNDLE_ITEMS ON)
+            list(APPEND DIRS /opt/local/lib ${QT_LIBS_DIR})
+            file(GLOB_RECURSE QMPLAY2_MODULES_AND_QT_PLUGINS
+                \"${MAC_BUNDLE_PATH}/Contents/MacOS/modules/*\"
+                \"${MAC_BUNDLE_PATH}/Contents/plugins/*.dylib\")
+            file(WRITE \"${MAC_BUNDLE_PATH}/Contents/Resources/qt.conf\")
+            fixup_bundle(${MAC_BUNDLE_PATH} \"\${QMPLAY2_MODULES_AND_QT_PLUGINS}\" \"\${DIRS}\")
+        ")
     endif()
-    install(CODE "
-        include(BundleUtilities)
-        set(BU_CHMOD_BUNDLE_ITEMS ON)
-        list(APPEND DIRS /usr/local/lib ${QT_LIBS_DIR})
-        file(GLOB_RECURSE QMPLAY2_MODULES_AND_QT_PLUGINS
-            \"${MAC_BUNDLE_PATH}/Contents/MacOS/modules/*\"
-            \"${MAC_BUNDLE_PATH}/Contents/plugins/*.dylib\")
-        file(WRITE \"${MAC_BUNDLE_PATH}/Contents/Resources/qt.conf\")
-        fixup_bundle(${MAC_BUNDLE_PATH} \"\${QMPLAY2_MODULES_AND_QT_PLUGINS}\" \"\${DIRS}\")
-    ")
 else()
     # executable
     install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
+if(1)
 
     # desktop files
     file(GLOB DESKTOP_FILES Unix/QMPlay2*.desktop)

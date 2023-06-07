@@ -97,7 +97,7 @@ private:
     QMutex stopVAMutex, endMutex, seekMutex;
     IOController<> ioCtrl;
     IOController<Demuxer> demuxer;
-    QString title, artist, album;
+    QString title, artist, album, description;
     double playIfBuffered, time, updateBufferedTime;
 private slots:
     void stopVADec();

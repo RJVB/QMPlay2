@@ -47,4 +47,8 @@ if(WIN32 AND USE_OPENGL)
     target_link_libraries(${PROJECT_NAME} opengl32)
 endif()
 
+if(APPLE)
+    target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARY})
+endif()
+
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${MODULES_INSTALL_PATH})
