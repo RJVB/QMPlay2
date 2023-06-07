@@ -278,12 +278,6 @@ if(USE_YOUTUBEDL)
         YouTubeDL.cpp
     )
 endif()
-list(APPEND QMPLAY2_HDR
-    QtLegacySupport.hpp
-)
-list(APPEND QMPLAY2_SRC
-    QtLegacySupport.cpp
-)
 
 set(QMPLAY2_RESOURCES
     languages.qrc

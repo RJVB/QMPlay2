@@ -50,8 +50,6 @@
 
 #include <algorithm>
 
-#include <QtLegacySupport.hpp>
-
 Q_LOGGING_CATEGORY(mb, "MediaBrowser")
 
 constexpr const char *g_mediaBrowserBaseUrl = "https://raw.githubusercontent.com/zaps166/QMPlay2OnlineContents/master/";
@@ -584,7 +582,7 @@ void MediaBrowser::downloadScripts(const QByteArray &jsonData)
     }();
 
     bool removed = false, downloading = false;
-    for (const QJV jsonVal : jsonArr)
+    for (const QJsonValue jsonVal : jsonArr)
     {
         const auto name = jsonVal["Name"].toString();
         const auto path = jsonVal["Path"].toString();

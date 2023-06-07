@@ -47,7 +47,7 @@ else()
     set(QT_PREFIX Qt5)
 endif()
 
-find_package(${QT_PREFIX}Widgets 5.9.8 REQUIRED)
+find_package(${QT_PREFIX}Widgets 5.10 REQUIRED)
 if(BUILD_WITH_QT6)
     find_package(Qt6Core5Compat REQUIRED)
 endif()

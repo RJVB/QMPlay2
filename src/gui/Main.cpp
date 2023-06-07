@@ -672,11 +672,9 @@ int main(int argc, char *argv[])
 #endif
 
 #ifdef Q_OS_MACOS
-#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
     auto fmt = QSurfaceFormat::defaultFormat();
     fmt.setColorSpace(QSurfaceFormat::sRGBColorSpace);
     QSurfaceFormat::setDefaultFormat(fmt);
-#endif
 #endif
 
 #ifndef Q_OS_WIN

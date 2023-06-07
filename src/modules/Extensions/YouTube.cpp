@@ -44,8 +44,6 @@
 #include <QMenu>
 #include <QUrl>
 
-#include <QtLegacySupport.hpp>
-
 Q_LOGGING_CATEGORY(youtube, "Extensions/YouTube")
 
 #define YOUTUBE_URL "https://www.youtube.com"
@@ -887,7 +885,7 @@ void YouTube::setSearchResults(const QJsonObject &jsonObj, bool isContinuation)
         const auto onResponseReceivedCommands = jsonObj
             ["onResponseReceivedCommands"].toArray()
         ;
-        for (const QJV val : onResponseReceivedCommands)
+        for (const QJsonValue val : onResponseReceivedCommands)
         {
             items = val
                 ["appendContinuationItemsAction"]
@@ -899,8 +897,8 @@ void YouTube::setSearchResults(const QJsonObject &jsonObj, bool isContinuation)
     }
     else
     {
-        items = QJV(jsonObj
-            ["contents"])
+        items = jsonObj
+            ["contents"]
             ["twoColumnSearchResultsRenderer"]
             ["primaryContents"]
             ["sectionListRenderer"]
@@ -908,9 +906,9 @@ void YouTube::setSearchResults(const QJsonObject &jsonObj, bool isContinuation)
         ;
     }
 
-    for (const QJV obj : items)
+    for (const QJsonValue obj : items)
     {
-        const QJsonArray contents = obj
+        const auto contents = obj
             ["itemSectionRenderer"]
             ["contents"].toArray()
         ;
@@ -924,10 +922,10 @@ void YouTube::setSearchResults(const QJsonObject &jsonObj, bool isContinuation)
         if (!token.isEmpty())
             m_continuationToken = token;
 
-        for (const QJV obj : contents)
+        for (const QJsonValue obj : contents)
         {
-            const QJO videoRenderer = obj["videoRenderer"].toObject();
-            const QJO playlistRenderer = obj["playlistRenderer"].toObject();
+            const auto videoRenderer = obj["videoRenderer"].toObject();
+            const auto playlistRenderer = obj["playlistRenderer"].toObject();
 
             const bool isVideo = !videoRenderer.isEmpty() && playlistRenderer.isEmpty();
 
@@ -1025,8 +1023,8 @@ void YouTube::setRelatedResults(const QJsonObject &jsonObj, bool isContinuation)
 {
     QJsonArray items;
 
-    items = QJV(jsonObj
-        ["contents"])
+    items = jsonObj
+        ["contents"]
         ["twoColumnWatchNextResults"]
         ["secondaryResults"]
         ["secondaryResults"]
@@ -1034,8 +1032,8 @@ void YouTube::setRelatedResults(const QJsonObject &jsonObj, bool isContinuation)
 
     for (const QJsonValue obj : items)
     {
-        const auto videoRenderer = QJV(obj)["compactVideoRenderer"].toObject();
-        const auto playlistRenderer = QJV(obj)["compactPlaylistRenderer"].toObject();
+        const auto videoRenderer = obj["compactVideoRenderer"].toObject();
+        const auto playlistRenderer = obj["compactPlaylistRenderer"].toObject();
 
         const bool isVideo = !videoRenderer.isEmpty() && playlistRenderer.isEmpty();
 
@@ -1047,28 +1045,28 @@ void YouTube::setRelatedResults(const QJsonObject &jsonObj, bool isContinuation)
 
         if (isVideo)
         {
-            title = QJV(videoRenderer["title"])["simpleText"].toString();
+            title = videoRenderer["title"]["simpleText"].toString();
             contentId = videoRenderer["videoId"].toString();
             if (title.isEmpty() || contentId.isEmpty())
                 continue;
 
-            length = QJV(videoRenderer["lengthText"])["simpleText"].toString();
-            user = QJV(videoRenderer["longBylineText"])["runs"].toArray().at(0)["text"].toString();
-            publishTime = QJV(videoRenderer["publishedTimeText"])["simpleText"].toString();
-            viewCount = QJV(videoRenderer["shortViewCountText"])["simpleText"].toString();
-            thumbnail = QJV(videoRenderer["thumbnail"])["thumbnails"].toArray().at(0)["url"].toString();
+            length = videoRenderer["lengthText"]["simpleText"].toString();
+            user = videoRenderer["longBylineText"]["runs"].toArray().at(0)["text"].toString();
+            publishTime = videoRenderer["publishedTimeText"]["simpleText"].toString();
+            viewCount = videoRenderer["shortViewCountText"]["simpleText"].toString();
+            thumbnail = videoRenderer["thumbnail"]["thumbnails"].toArray().at(0)["url"].toString();
 
             url = YOUTUBE_URL "/watch?v=" + contentId;
         }
         else
         {
-            title = QJV(playlistRenderer["title"])["simpleText"].toString();
+            title = playlistRenderer["title"]["simpleText"].toString();
             contentId = playlistRenderer["playlistId"].toString();
             if (title.isEmpty() || contentId.isEmpty())
                 continue;
 
-            user = QJV(playlistRenderer["longBylineText"])["simpleText"].toString();
-            thumbnail = QJV(playlistRenderer["thumbnail"])["thumbnails"].toArray().at(0)["url"].toString();
+            user = playlistRenderer["longBylineText"]["simpleText"].toString();
+            thumbnail = playlistRenderer["thumbnail"]["thumbnails"].toArray().at(0)["url"].toString();
 
             url = YOUTUBE_URL "/playlist?list=" + contentId;
         }
@@ -1299,7 +1297,7 @@ void YouTube::preparePlaylist(const QByteArray &data, QTreeWidgetItem *tWI)
 {
     QStringList playlist;
 
-    const QJsonArray contents = QJD(getYtInitialData(data))
+    const auto contents = getYtInitialData(data)
         ["contents"]
         ["twoColumnBrowseResultsRenderer"]
         ["tabs"].toArray().at(0)
@@ -1313,7 +1311,7 @@ void YouTube::preparePlaylist(const QByteArray &data, QTreeWidgetItem *tWI)
         ["contents"].toArray()
     ;
 
-    for (const QJV obj : contents)
+    for (const QJsonValue obj : contents)
     {
         const auto title = obj["playlistVideoRenderer"]["title"]["runs"].toArray().at(0)["text"].toString();
         const auto videoId = obj["playlistVideoRenderer"]["videoId"].toString();

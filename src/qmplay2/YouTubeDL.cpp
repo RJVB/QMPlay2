@@ -34,8 +34,6 @@
 
 // FIXME: Why Haiku can't use upstream yt-dlp?
 
-#include <QtLegacySupport.hpp>
-
 constexpr const char *g_name = "YouTubeDL";
 static bool g_mustUpdate = true;
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
@@ -262,8 +260,8 @@ QStringList YouTubeDL::exec(const QString &url, const QStringList &args, QString
             {
                 const QString url = result.at(i - 1);
 
-                const QJD json = QJsonDocument::fromJson(result.at(i).toUtf8());
-                for (const QJV &formats : json["formats"].toQJsonArray())
+                const QJsonDocument json = QJsonDocument::fromJson(result.at(i).toUtf8());
+                for (const QJsonValue &formats : json["formats"].toArray())
                 {
                     if (url == formats["url"].toString())
                         QMPlay2Core.addCookies(url, formats["http_headers"]["Cookie"].toString().toUtf8());
